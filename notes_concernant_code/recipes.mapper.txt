@@ -1,0 +1,20 @@
+Note du : 18/09/2026 - 11:48
+
+// Application du Destructuring, Spread Operator et Nullish Coalescing
+	static fromNewDTO({ title, description, tags, ...dtoRecipe }: NewRecipeDTO, authorId: number): NewRecipe {
+		return {
+			...dtoRecipe,
+
+
+        --- APPLIQUER CECI UNIQUEMENT SI LES CHAMPS SONT POTENTIELLEMENTS OPTIONNELS DANS LE MODEL!! ---
+			// L'optional chaining (?.) évite un crash si 'title' est null/undefined ;
+			// le nullish coalescing (??) fournit une chaîne vide par défaut dans ce cas.
+			title: title?.trim() ?? "",
+			description: description?.trim() ?? "",
+
+			title: title.trim(),
+			description: description.trim(),
+			tags: tags ?? [],
+			authorId,
+		};
+	}

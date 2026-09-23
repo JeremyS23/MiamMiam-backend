@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: API MiamMiam
+  version: 1.0.0
+  description: Spécification OpenAPI de l'API REST MiamMiam
+
+paths:
+  /recipes:
+    get:
+      summary: Récupère toutes les recettes
+      tags:
+        - Recipes
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: authorId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: ingredient
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: maxPrepTime
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des recettes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipeDTO'
+        '400':
+          description: Paramètres invalides
+
+    post:
+      summary: Crée une nouvelle recette
+      tags:
+        - Recipes
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecipeDTO'
+      responses:
+        '201':
+          description: Recette créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeDTO'
+        '400':
+          description: Corps invalide ou catégorie inexistante
+        '401':
+          description: Non authentifié
+        '500':
+          description: Erreur serveur
+
+  /recipes/{id}:
+    get:
+      summary: Récupère une recette par son ID
+      tags:
+        - Recipes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Détails de la recette
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeDTO'
+        '400':
+          description: ID invalide
+        '404':
+          description: Recette non trouvée
+
+    put:
+      summary: Remplace intégralement une recette (auteur ou admin)
+      tags:
+        - Recipes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRecipeDTO'
+      responses:
+        '204':
+          description: Recette remplacée avec succès
+        '400':
+          description: Données invalides
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé
+        '404':
+          description: Recette non trouvée
+
+    patch:
+      summary: Met à jour partiellement une recette (auteur ou admin)
+      tags:
+        - Recipes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatedRecipeDTO'
+      responses:
+        '200':
+          description: Recette mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipeDTO'
+        '400':
+          description: Données invalides ou corps vide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé
+        '404':
+          description: Recette non trouvée
+
+    delete:
+      summary: Supprime une recette (auteur ou admin)
+      tags:
+        - Recipes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Recette supprimée
+        '400':
+          description: ID invalide
+        '401':
+          description: Non authentifié
+        '403':
+          description: Accès refusé
+        '404':
+          description: Recette non trouvée
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    NewRecipeDTO:
+      type: object
+      required:
+        - title
+        - description
+        - prepTime
+        - cookTime
+        - servings
+        - difficulty
+        - categoryId
+        - ingredients
+        - steps
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        prepTime:
+          type: integer
+        cookTime:
+          type: integer
+        servings:
+          type: integer
+        difficulty:
+          type: integer
+        categoryId:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        ingredients:
+          type: array
+          items:
+            type: object
+        steps:
+          type: array
+          items:
+            type: string
+
+    UpdatedRecipeDTO:
+      type: object
+      description: Tous les champs sont facultatifs.
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        prepTime:
+          type: integer
+        cookTime:
+          type: integer
+        servings:
+          type: integer
+        difficulty:
+          type: integer
+        categoryId:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        ingredients:
+          type: array
+          items:
+            type: object
+        steps:
+          type: array
+          items:
+            type: string
+
+    RecipeDTO:
+      allOf:
+        - $ref: '#/components/schemas/NewRecipeDTO'
+        - type: object
+          required:
+            - id
+            - authorId
+            - createdAt
+            - updatedAt
+          properties:
+            id:
+              type: integer
+            authorId:
+              type: integer
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time

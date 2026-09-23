@@ -1,0 +1,13 @@
+Note du 18/09/2026 - 12:05
+
+/**
+ * Convertit un User en UserDTO en excluant le mot de passe
+ * A UTILISER QU'EN CAS DE DEMANDE D'EXCLUSION DU MDP!!
+ */
+static toDTO({ password, createdAt, updatedAt, ...userData }: User): UserDTO {
+    return {
+        ...userData, // Contient id, email, firstName, lastName, role, favorites (sans password)
+        createdAt: createdAt.toISOString(),
+        updatedAt: updatedAt.toISOString(),
+    };
+}

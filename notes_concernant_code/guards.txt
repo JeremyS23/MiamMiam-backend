@@ -1,0 +1,11 @@
+Note du 19/09/2026 à 15:27
+
+export function isNonEmptyString(obj: any): obj is string {
+	//return isString(obj) && obj.trim().length !== 0;
+
+	// Remplace isString() par la vérification native typeof :
+	// typeof renvoie directement le type sous forme de texte (ex: "string").
+	// Cela évite un appel de fonction externe inutile pour une opération native standard.
+
+	return typeof obj === "string" && obj.trim().length !== 0;
+}
