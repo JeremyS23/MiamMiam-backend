@@ -12,16 +12,6 @@ Content-Type: application/json
   "lastName": "Leroy"
 }
 
-### Ajout d'une requête POST pour inscrire et récupérer le mdp haché pour l'ajouter à seed.ts
-POST {{server}}/auth/register
-Content-Type: application/json
-
-{
-  "email": "bob@vinci.be",
-  "password": "bob",
-  "firstName": "Bob",
-  "lastName": "Martin"
-}
 
 ### Inscription avec un email déjà utilisé -> 409
 POST {{server}}/auth/register
@@ -79,9 +69,6 @@ Authorization: {{login.response.body.token}}
 ### Sans token -> 401
 GET {{server}}/auth/me
 
-
-
-// Vérifier si le gros message de retour dans le terminal est normal!!!
 
 ### Token forgé à la main (base64 d'un email existant)... ça passe ! À corriger plus tard dans le cours.
 GET {{server}}/auth/me
