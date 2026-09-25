@@ -13,17 +13,18 @@ export const authController = Router();
  * POST /auth/register
  * Crée un compte et renvoie un token (l'utilisateur est directement connecté)
  */
-authController.post("/register", (req: Request, res: Response) => {
+authController.post("/register", async (req: Request, res: Response) => {
 	LoggerService.info("[POST] /auth/register");
 
 	const body: unknown = req.body;
 	if (!isNewUserDTO(body)) return res.sendStatus(400);
 
 	const newUser = UsersMapper.fromNewDTO(body);
-	const user = UsersService.create(newUser);
+	const user = await UsersService.create(newUser);
 	if (!user) return res.sendStatus(409); // email déjà utilisé
 
-	const token = AuthService.login(user.email, user.password);
+	// On passe le mdp en clair reçu dans la requête (body.password)
+	const token = await AuthService.login(user.email, body.password);
 	if (!token) return res.sendStatus(500);
 
 	//const tokenDTO: TokenDTO = { token: token };
@@ -38,7 +39,7 @@ authController.post("/register", (req: Request, res: Response) => {
  * POST /auth/login
  * Vérifie les identifiants et renvoie un token
  */
-authController.post("/login", (req: Request, res: Response) => {
+authController.post("/login", async (req: Request, res: Response) => {
 	LoggerService.info("[POST] /auth/login");
 
 	const body: unknown = req.body;
@@ -52,7 +53,7 @@ authController.post("/login", (req: Request, res: Response) => {
 	// Destructuring des variables
 	const { email, password } = body;
 
-	const token = AuthService.login(email, password);
+	const token = await AuthService.login(email, password);
 	if (!token) return res.sendStatus(401);
 
 	//const tokenDTO: TokenDTO = { token: token };
@@ -77,13 +78,12 @@ authController.get("/me", AuthService.authorize, (req: AuthenticatedRequest, res
 
 	if (!user) return res.sendStatus(401);
 
-	
 	// Récupération de l'utilisateur complet en DB à partir de l'email du token
 	const fullUser = UsersService.getByEmail(user.email);
 	if (!fullUser) {
 		return res.sendStatus(401);
 	}
-	
+
 	//const userDTO: UserDTO = UsersMapper.toDTO(user);
 
 	const userDTO: UserDTO = UsersMapper.toDTO(fullUser);

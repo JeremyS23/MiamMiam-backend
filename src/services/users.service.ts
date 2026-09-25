@@ -2,6 +2,7 @@ import { UsersMapper } from "../mappers/users.mapper";
 import { ERole, NewUser, User, UserDBO } from "../models/user.model";
 import { AbstractService } from "./abstract.service";
 import { LoggerService } from "./logger.service";
+import bcrypt from "bcrypt";
 
 export class UsersService extends AbstractService {
 	protected static dbPath: string = "data/users.json";
@@ -57,15 +58,8 @@ export class UsersService extends AbstractService {
 	 * Crée un utilisateur (rôle "user" par défaut).
 	 * @returns l'utilisateur créé, ou undefined si l'email est déjà utilisé
 	 */
-	static create(newUser: NewUser): User | undefined {
+	static async create(newUser: NewUser): Promise<User | undefined> {
 		const users = this.readUsersDB();
-
-		/*
-		if (this.getByEmail(newUser.email)) {
-			LoggerService.error("Email already exists: " + newUser.email);
-			return undefined;
-		}
-		*/
 
 		// Vérifie si l'email existe déjà dans la base (insensible à la casse).
 		// L'opérateur optional chaining (?.) évite un crash si un utilisateur du JSON ou le newUser a un email absent/undefined.
@@ -76,23 +70,13 @@ export class UsersService extends AbstractService {
 			return undefined;
 		}
 
-		/*
-		const user: User = {
-			id: UsersService.getNextId(users),
-			email: newUser.email,
-			password: newUser.password, // stocké tel quel... pour l'instant
-			firstName: newUser.firstName,
-			lastName: newUser.lastName,
-			role: ERole.USER,
-			favorites: [],
-			createdAt: new Date(),
-			updatedAt: new Date(),
-		};
-    */
+		// Hacher le mot de passe avant de le stocker (en créant une constante)
+		//const passwordHash = await bcrypt.hash(newUser.password, 10);
 
 		const user: User = {
-			...newUser,
 			id: UsersService.getNextId(users),
+			...newUser,
+			password: await bcrypt.hash(newUser.password, 10), // Ou bien le hacher directement ici
 			role: ERole.USER,
 			favorites: [],
 			createdAt: new Date(),

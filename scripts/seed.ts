@@ -7,12 +7,12 @@ import fs from "fs";
 
 const NOW = "2026-09-01T08:00:00.000Z";
 
-// --- Users (UserDBO) --- mots de passe en clair, pour l'instant...
+// --- Users (UserDBO) --- mots de passe hachés dès à présent.
 const users = [
   {
     id: 1,
     email: "admin@miammiam.be",
-    password: "admin",
+    password: "$2b$10$tCz5U.qBy8kIFDL3Xaj30ur1DhX.2BKEz7uK2LwScJW4q.b.Yg/le",
     first_name: "Admin",
     last_name: "MiamMiam",
     role: "admin",
@@ -23,7 +23,7 @@ const users = [
   {
     id: 2,
     email: "alice@vinci.be",
-    password: "alice",
+    password: "$2b$10$DPxZOnu1O5xWd7OECLdWGeZEzW.cF2LWSfphiNTq8PW17V89gX3L2",
     first_name: "Alice",
     last_name: "Dupont",
     role: "user",
@@ -34,7 +34,7 @@ const users = [
   {
     id: 3,
     email: "bob@vinci.be",
-    password: "bob",
+    password: "$2b$10$AyhaEgLYkXc7XFxVhuZFN.10TVmbT6vbhEqxg0RTG4Fzp2svRSlIi",
     first_name: "Bob",
     last_name: "Martin",
     role: "user",

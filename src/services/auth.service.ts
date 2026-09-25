@@ -5,18 +5,27 @@ import { ERole, User } from "../models/user.model";
 import { generateToken, verifyToken } from "../utils/auth";
 import { LoggerService } from "./logger.service";
 import { UsersService } from "./users.service";
+import bcrypt from "bcrypt";
 
 export class AuthService {
 	/**
 	 * Vérifie les identifiants et génère un JWT valide
 	 * @returns un token si l'email et le mot de passe sont corrects, undefined sinon
 	 */
-	static login(email: string, password: string): string | undefined {
+	static async login(email: string, password: string): Promise<string | undefined> {
 		const user = UsersService.getByEmail(email);
 
+		/*
 		if (!user || user.password !== password) {
 			return undefined;
-		}
+		}	
+		*/
+
+		if (!user) return undefined;
+
+		// Vérification du mot de passe par l'utilisation de bcrypt.compare
+		const isMatch = await bcrypt.compare(password, user.password);
+		if(!isMatch) return undefined;
 
 		//return generateFakeToken(user.email);
 
@@ -63,7 +72,6 @@ export class AuthService {
 	 * Répond 403 sinon.
 	 */
 	static isAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-		
 		// Vérification de la présence de req.user et du rôle administrateur
 		if (req.user?.role !== ERole.ADMIN) {
 			return res.sendStatus(req.user ? 403 : 401);

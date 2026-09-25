@@ -56,10 +56,10 @@ export class UsersMapper {
   */
 
 	// Destructuring des paramètres et propagation du reste (ex: password)
-	static fromNewDTO({ email, firstName, lastName, ...UserDTOdata }: NewUserDTO): NewUser {
+	static fromNewDTO({ email, password, firstName, lastName, ...UserDTOdata }: NewUserDTO): NewUser {
 		return {
-			...UserDTOdata,
 			email: email.trim().toLowerCase(),
+			password: password.trim().toLowerCase(),
 			firstName: firstName.trim(),
 			lastName: lastName.trim(),
 		};
